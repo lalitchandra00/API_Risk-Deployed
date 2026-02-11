@@ -1,0 +1,21 @@
+{
+  "projectId": "529902c3-68c5-4cdd-99e0-e59bc409f48d",
+  "projectType": "Unknown",
+  "scanMode": "staged",
+  "enforcement": "enabled",
+  "features": {
+    "reporting": true,
+    "integration": false,
+    "aiEscalation": false,
+    "secretRemediation": false
+  },
+  "integration": {
+    "enabled": false,
+    "endpointUrl": ""
+  },
+  "severityRules": {
+    "block": [],
+    "warn": [],
+    "allow": []
+  }
+}

@@ -37,7 +37,7 @@ function readConfig(configPath) {
     }
 }
 
-export async function runCli({ cwd }) {
+export async function runCli({ args = [], cwd }) {
     // Boundary: CLI orchestration only. Avoid importing this module in lower layers.
     logInfo("CodeProof run started.");
 
@@ -54,7 +54,7 @@ export async function runCli({ cwd }) {
         logError(error?.message || "Unable to read enforcement state.");
         process.exit(1);
     }
-    const isPreCommit = Boolean(process.env.CODEPROOF_PRECOMMIT);
+    const isPreCommit = args.includes("--precommit") || Boolean(process.env.CODEPROOF_PRECOMMIT);
 
     if (isPreCommit && enforcement === "disabled") {
         logWarn("CodeProof enforcement is temporarily disabled.");
