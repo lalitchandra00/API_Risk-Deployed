@@ -42,7 +42,16 @@ function getNextReportNumber(reportDir) {
 
 export function writeReport({ projectRoot, report }) {
   const reportDir = getReportDir(projectRoot);
-  ensureReportDir(reportDir);
+  console.log("[Report Writer] projectRoot:", projectRoot);
+  console.log("[Report Writer] reportDir:", reportDir);
+  
+  try {
+    ensureReportDir(reportDir);
+    console.log("[Report Writer] Directory ensured:", reportDir);
+  } catch (err) {
+    console.error("[Report Writer] Failed to create directory:", err.message);
+    throw err;
+  }
 
   // Cleanup old temp files before creating new ones
   try {
@@ -72,10 +81,14 @@ export function writeReport({ projectRoot, report }) {
   const tempPath = path.join(reportDir, `.tmp-${process.pid}-${Date.now()}.json`);
   const payload = JSON.stringify(report, null, 2) + "\n";
   
+  console.log("[Report Writer] Writing to:", reportPath);
+  
   try {
     fs.writeFileSync(tempPath, payload, "utf8");
     fs.renameSync(tempPath, reportPath);
+    console.log("[Report Writer] Report successfully written:", reportPath);
   } catch (err) {
+    console.error("[Report Writer] Write failed:", err.message);
     // Cleanup temp file on error
     try {
       if (fs.existsSync(tempPath)) {
