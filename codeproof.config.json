@@ -1,7 +1,7 @@
 {
   "projectId": "854292b0-248d-4a71-a2ba-25c23b652afd",
   "projectType": "Node",
-  "scanMode": "full",
+  "scanMode": "staged",
   "enforcement": "enabled",
   "features": {
     "reporting": true,
