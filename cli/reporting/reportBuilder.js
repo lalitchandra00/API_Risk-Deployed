@@ -45,11 +45,13 @@ function normalizeSeverity(value) {
 
 export function buildReport({
   projectRoot,
+  projectId,
+  clientId,
+  reportId,
   scanMode,
   filesScannedCount,
   baselineFindings,
   aiReviewed,
-  runId,
   timestamp
 }) {
   const aiById = new Map(aiReviewed.map((entry) => [entry.finding.findingId, entry.decision]));
@@ -84,9 +86,10 @@ export function buildReport({
       : "allowed";
 
   return {
-    runId,
+    reportId,
     timestamp,
-    projectRoot,
+    projectId,
+    clientId,
     scanMode,
     summary: {
       totalFilesScanned: filesScannedCount,

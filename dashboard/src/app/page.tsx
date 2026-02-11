@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Hero from "../components/Hero";
 import HowItWorks from "../components/HowItWorks";
+import CliDocsSection from "../components/CliDocsSection";
 import FeatureCard from "../components/FeatureCard";
 import MetricCard from "../components/MetricCard";
 import Footer from "../components/Footer";
@@ -126,6 +127,7 @@ export default function Home() {
     <main className="bg-slate-50 text-slate-900">
       <Hero />
       <HowItWorks />
+      <CliDocsSection />
       <section id="features" className="mx-auto max-w-6xl px-6 py-20">
         <div className="flex flex-col gap-3 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">

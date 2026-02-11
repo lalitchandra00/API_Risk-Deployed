@@ -8,6 +8,7 @@ import { ensureEnvFile, readEnvKeys, appendEnvEntries } from "../utils/envManage
 import { backupFileOnce, extractSecretValueFromLine, replaceSecretInFile } from "../utils/fileRewriter.js";
 import { resolveFeatureFlags, isVerbose } from "../core/featureFlags.js";
 import { reportFeatureDisabled, warnExperimentalOnce } from "../core/safetyGuards.js";
+import { readLatestReport } from "../reporting/reportReader.js";
 
 const TEST_PATH_HINTS = [
   "test",
@@ -37,24 +38,6 @@ function isIgnoredPath(filePath, excludes) {
   return false;
 }
 
-function readLatestReport(reportPath) {
-  if (!fs.existsSync(reportPath)) {
-    return null;
-  }
-
-  const content = fs.readFileSync(reportPath, "utf8");
-  const lines = content.split(/\r?\n/).filter(Boolean);
-  if (lines.length === 0) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(lines[lines.length - 1]);
-  } catch {
-    return null;
-  }
-}
-
 function confirmProceed(message) {
   return new Promise((resolve) => {
     const rl = readline.createInterface({
@@ -73,7 +56,6 @@ export async function runMoveSecret({ cwd }) {
   // Boundary: remediation reads reports only and must not depend on analysis state.
   ensureGitRepo(cwd);
   const gitRoot = getGitRoot(cwd);
-  const reportPath = path.join(gitRoot, "codeproof-report.log");
   const configPath = path.join(gitRoot, "codeproof.config.json");
   let config = {};
   try {
@@ -92,7 +74,7 @@ export async function runMoveSecret({ cwd }) {
   }
 
   warnExperimentalOnce("Experimental feature enabled: move-secret.", logWarn);
-  const latestReport = readLatestReport(reportPath);
+  const latestReport = readLatestReport(gitRoot)?.report || null;
 
   if (!latestReport || !Array.isArray(latestReport.findings)) {
     logWarn("No reports found. Run 'codeproof run' first.");
