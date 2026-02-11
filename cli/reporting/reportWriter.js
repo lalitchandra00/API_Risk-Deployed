@@ -44,6 +44,22 @@ export function writeReport({ projectRoot, report }) {
   const reportDir = getReportDir(projectRoot);
   ensureReportDir(reportDir);
 
+  // Cleanup old temp files before creating new ones
+  try {
+    const files = fs.readdirSync(reportDir);
+    for (const file of files) {
+      if (file.startsWith('.tmp-')) {
+        try {
+          fs.unlinkSync(path.join(reportDir, file));
+        } catch {
+          // Ignore errors on cleanup
+        }
+      }
+    }
+  } catch {
+    // Ignore cleanup errors
+  }
+
   // Per-run JSON keeps every audit entry immutable and easy to archive.
   let reportNumber = getNextReportNumber(reportDir);
   let reportPath = path.join(reportDir, `${REPORT_PREFIX}${reportNumber}${REPORT_SUFFIX}`);
@@ -55,8 +71,21 @@ export function writeReport({ projectRoot, report }) {
   // Use numeric sequencing over timestamps to avoid collisions in fast CI runs.
   const tempPath = path.join(reportDir, `.tmp-${process.pid}-${Date.now()}.json`);
   const payload = JSON.stringify(report, null, 2) + "\n";
-  fs.writeFileSync(tempPath, payload, "utf8");
-  fs.renameSync(tempPath, reportPath);
+  
+  try {
+    fs.writeFileSync(tempPath, payload, "utf8");
+    fs.renameSync(tempPath, reportPath);
+  } catch (err) {
+    // Cleanup temp file on error
+    try {
+      if (fs.existsSync(tempPath)) {
+        fs.unlinkSync(tempPath);
+      }
+    } catch {
+      // Ignore cleanup errors
+    }
+    throw err;
+  }
 
   return reportPath;
 }

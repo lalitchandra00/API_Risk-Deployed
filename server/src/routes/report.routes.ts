@@ -21,9 +21,7 @@ export const reportRouter = (params: { env: EnvConfig; featureFlags: FeatureFlag
 		router.post("/api/reports", createReportHandler);
 	}
 
-	if (featureFlags.enablePublicReports) {
-		router.get("/api/reports/:reportId", getReportByIdHandler);
-	}
+	router.get("/api/reports/:reportId", getReportByIdHandler);
 
 	return router;
 };

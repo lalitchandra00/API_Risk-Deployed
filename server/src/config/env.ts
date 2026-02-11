@@ -43,6 +43,7 @@ export const loadEnv = (): EnvConfig => {
     throw new Error("JWT_SECRET is required");
   }
 
+
   return {
     port,
     mongoUri,

@@ -44,3 +44,20 @@ export function getStagedFiles(cwd) {
         .map((line) => line.trim())
         .filter(Boolean);
 }
+
+export function getRepoIdentifier(gitRoot) {
+    try {
+        const result = runGit(["config", "--get", "remote.origin.url"], gitRoot);
+        if (result.status === 0) {
+            return String(result.stdout).trim() || gitRoot;
+        }
+    } catch {
+        // Fallback to directory name
+    }
+    return gitRoot;
+}
+
+export function getProjectName(gitRoot) {
+    const parts = gitRoot.split(/[\\/]/);
+    return parts[parts.length - 1] || "Unknown";
+}

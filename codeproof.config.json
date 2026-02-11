@@ -1,8 +1,8 @@
 {
-  "projectId": "529902c3-68c5-4cdd-99e0-e59bc409f48d",
+  "projectId": "66629c87-90c3-4d20-a41b-03a1db8c2d14",
   "projectType": "Unknown",
   "scanMode": "staged",
-  "enforcement": "enabled",
+  "enforcement": "disabled",
   "features": {
     "reporting": true,
     "integration": false,

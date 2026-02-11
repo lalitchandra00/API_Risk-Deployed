@@ -23,7 +23,7 @@ export const createApp = (params: { env: EnvConfig; featureFlags: FeatureFlags }
 
   app.use(authRouter);
   app.use(reportRouter({ env, featureFlags }));
-  app.use(projectRouter({ featureFlags, jwtSecret: env.jwtSecret }));
+  app.use(projectRouter({ jwtSecret: env.jwtSecret }));
 
   app.use(errorHandler);
 

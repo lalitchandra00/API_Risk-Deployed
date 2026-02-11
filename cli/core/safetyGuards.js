@@ -37,13 +37,13 @@ export function withFailOpenIntegration(action) {
   }
 }
 
-export function withFailOpenAiEscalation(enabled, action) {
+export async function withFailOpenAiEscalation(enabled, action) {
   if (!enabled) {
     return [];
   }
 
   try {
-    return action();
+    return await action();
   } catch {
     // AI failures downgrade to warnings by returning no decisions.
     return [];

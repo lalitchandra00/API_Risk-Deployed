@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { ensureGitRepo, getGitRoot, getStagedFiles } from "../utils/git.js";
+import { ensureGitRepo, getGitRoot, getStagedFiles, getRepoIdentifier, getProjectName } from "../utils/git.js";
 import { logError, logInfo, logSuccess, logWarn } from "../utils/logger.js";
 import { buildScanTargets } from "../utils/fileScanner.js";
 import { runRuleEngine } from "../engine/ruleEngine.js";
@@ -110,7 +110,7 @@ export async function runCli({ args = [], cwd }) {
     }
 
     const aiDecisions = aiInputs.length > 0
-        ? withFailOpenAiEscalation(features.aiEscalation, () => analyze(aiInputs, projectContext))
+        ? await withFailOpenAiEscalation(features.aiEscalation, () => analyze(aiInputs, projectContext))
         : [];
     const { blockFindings, warnFindings, aiReviewed, exitCode } = mergeDecisions({
         baselineFindings: [...findings, ...escalations],
@@ -123,9 +123,13 @@ export async function runCli({ args = [], cwd }) {
             const reportId = randomUUID();
             const projectId = config.projectId || "";
             const clientId = getClientId();
+            const projectName = getProjectName(gitRoot);
+            const repoIdentifier = getRepoIdentifier(gitRoot);
             const report = buildReport({
                 projectRoot: gitRoot,
                 projectId,
+                projectName,
+                repoIdentifier,
                 clientId,
                 reportId,
                 scanMode,

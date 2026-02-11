@@ -37,8 +37,13 @@ export async function runReportDashboard({ cwd }) {
 
     if (!latestReport) {
       logWarn("No reports found. Run `codeproof run` first.");
-    } else {
-      const integration = config?.integration || {};
+      return;
+    }
+
+    const integration = config?.integration || {};
+    const integrationEnabled = features.integration && Boolean(integration.enabled);
+    
+    if (integrationEnabled) {
       // Integrations are fail-open: never throw on network errors.
       withFailOpenIntegration(() => {
         sendReportToServer(latestReport, {
@@ -46,10 +51,13 @@ export async function runReportDashboard({ cwd }) {
           endpointUrl: integration.endpointUrl
         });
       });
+      logInfo("Report sent to server.");
+    } else {
+      reportFeatureDisabled("Integration", verbose, logInfo);
+    }
 
-      if (latestReport?.projectId) {
-        logInfo(`View dashboard: https://dashboard.codeproof.dev/project/${latestReport.projectId}`);
-      }
+    if (latestReport?.projectId) {
+      logInfo(`View dashboard: https://dashboard.codeproof.dev/project/${latestReport.projectId}`);
     }
   } else {
     reportFeatureDisabled("Reporting", verbose, logInfo);
