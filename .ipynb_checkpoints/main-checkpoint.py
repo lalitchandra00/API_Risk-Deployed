@@ -9,7 +9,7 @@ from fastapi import HTTPException
 
 
 app = FastAPI()
-pickle_in = open("model.pkl", "rb")
+pickle_in = open("model3.pkl", "rb")
 model = pickle.load(pickle_in)
 
 pickle_in_2 = open("vectorizer.pkl", "rb")
@@ -30,17 +30,12 @@ def API_Risk(text: str = Body(...,
         result = model.predict(textv)
 
         if result[0] == 2:
-            return {"found" : True,
-                "risk": "Critical",
-                "secret" : i}
+            return {"prediction": "Critical"}
 
         if result[0] == 1:
-            return {"found" : True,
-                "risk": "High Risk",
-                "secret" : i}
+            return {"prediction": "High Risk"}
 
-    return {"found" : False,
-        "risk": "No Risk"}
+    return {"prediction": "No Risk"}
 
 
 if __name__ == '__main__':
