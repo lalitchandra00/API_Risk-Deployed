@@ -1,17 +1,17 @@
 {
   "projectId": "66629c87-90c3-4d20-a41b-03a1db8c2d14",
   "projectType": "Unknown",
-  "scanMode": "staged",
+  "scanMode": "full",
   "enforcement": "disabled",
   "features": {
     "reporting": true,
-    "integration": false,
-    "aiEscalation": false,
+    "integration": true,
+    "aiEscalation": true,
     "secretRemediation": false
   },
   "integration": {
-    "enabled": false,
-    "endpointUrl": ""
+    "enabled": true,
+    "endpointUrl": "http://localhost:4000/api/reports"
   },
   "severityRules": {
     "block": [],

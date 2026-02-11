@@ -118,7 +118,7 @@ export async function runCli({ args = [], cwd }) {
     });
 
     if (features.reporting) {
-        withFailOpenReporting(() => {
+        await withFailOpenReporting(async () => {
             const timestamp = new Date().toISOString();
             const reportId = randomUUID();
             const projectId = config.projectId || "";
@@ -138,62 +138,88 @@ export async function runCli({ args = [], cwd }) {
                 aiReviewed,
                 timestamp
             });
-            // Reporting is fail-open: never block commits if logging fails.
+            // Report is saved to file and sent to server regardless of findings
+            logInfo("Saving report to file...");
             writeReport({ projectRoot: gitRoot, report });
+            logSuccess("Report saved locally.");
 
             const integration = config?.integration || {};
             const integrationEnabled = features.integration && Boolean(integration.enabled);
+            
+            // Always send to server in pre-commit or manual mode
             if (integrationEnabled) {
-                withFailOpenIntegration(() => {
+                logInfo("Syncing report to server...");
+                await withFailOpenIntegration(async () => {
                     // Network calls are fail-open; never affect exit codes.
-                    sendReportToServer(report, {
+                    return await sendReportToServer(report, {
                         enabled: true,
                         endpointUrl: integration.endpointUrl
                     });
                 });
+                logSuccess("Report synced to server.");
             } else {
                 reportFeatureDisabled("Integration", verbose, logInfo);
             }
         }, () => {
-            logWarn("Failed to write CodeProof report. Continuing without blocking.");
+            logWarn("Failed to process report. Continuing without blocking.");
         });
     } else {
         reportFeatureDisabled("Reporting", verbose, logInfo);
     }
 
     if (blockFindings.length > 0) {
-        logError(`Baseline rule violations (${blockFindings.length}):`);
+        logError(`\n❌ CRITICAL ISSUES FOUND (${blockFindings.length}):\n`);
         for (const finding of blockFindings) {
             const relative = path.relative(gitRoot, finding.filePath) || finding.filePath;
-            logError(
-                `${finding.ruleId} [${finding.severity}/${finding.confidence}] ${relative}:${finding.line} ${finding.message}`
-            );
-            logError(`  ${finding.snippet}`);
+            logError(`  • ${finding.ruleId.toUpperCase()}`);
+            logError(`    File: ${relative}:${finding.line}`);
+            logError(`    Issue: ${finding.message}`);
+            // console.log(`    Code: ${finding.snippet}`);
+            logError("");
         }
     }
 
     if (warnFindings.length > 0) {
-        logWarn(`Baseline warnings (${warnFindings.length}):`);
-        for (const finding of warnFindings) {
-            const relative = path.relative(gitRoot, finding.filePath) || finding.filePath;
-            logWarn(
-                `${finding.ruleId} [${finding.severity}/${finding.confidence}] ${relative}:${finding.line} ${finding.message}`
-            );
-            logWarn(`  ${finding.snippet}`);
+        // Filter to show only HIGH risk warnings
+        const highRiskWarnings = warnFindings.filter(f => f.confidence === "high");
+        if (highRiskWarnings.length > 0) {
+            logWarn(`\n⚠️  HIGH RISK WARNINGS (${highRiskWarnings.length}):\n`);
+            for (const finding of highRiskWarnings) {
+                const relative = path.relative(gitRoot, finding.filePath) || finding.filePath;
+                logWarn(`  • ${finding.ruleId.toUpperCase()}`);
+                logWarn(`    File: ${relative}:${finding.line}`);
+                logWarn(`    Issue: ${finding.message}`);
+                // console.log(`    Code: ${finding.snippet}`);
+                logWarn("");
+            }
         }
+        // comment out low risk warnings
+        // const lowRiskWarnings = warnFindings.filter(f => f.confidence !== "high");
+        // if (lowRiskWarnings.length > 0) {
+        //     logWarn(`Baseline warnings (${lowRiskWarnings.length}):`);
+        //     for (const finding of lowRiskWarnings) {
+        //         const relative = path.relative(gitRoot, finding.filePath) || finding.filePath;
+        //         logWarn(
+        //             `${finding.ruleId} [${finding.severity}/${finding.confidence}] ${relative}:${finding.line} ${finding.message}`
+        //         );
+        //         logWarn(`  ${finding.snippet}`);
+        //     }
+        // }
     }
 
     if (aiReviewed.length > 0) {
-        logWarn(`AI-reviewed findings (${aiReviewed.length}):`);
+        logWarn(`\n🤖 AI-REVIEWED FINDINGS (${aiReviewed.length}):\n`);
         for (const entry of aiReviewed) {
             const { finding, decision } = entry;
             const relative = path.relative(gitRoot, finding.filePath) || finding.filePath;
-            logWarn(
-                `${finding.ruleId} [${decision.verdict}/${decision.confidence.toFixed(2)}] ${relative}:${finding.line} ${decision.explanation}`
-            );
+            const verdict = decision.verdict === "block" ? "BLOCKED" : "WARNING";
+            logWarn(`  • ${finding.ruleId.toUpperCase()} [${verdict}]`);
+            logWarn(`    File: ${relative}:${finding.line}`);
+            logWarn(`    Analysis: ${decision.explanation}`);
             if (decision.suggestedFix) {
-                logWarn(`  Suggested fix: ${decision.suggestedFix}`);
+                logWarn(`    Fix: ${decision.suggestedFix}`);
             }
+            logWarn("");
         }
     }
 

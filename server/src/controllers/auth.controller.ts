@@ -27,13 +27,15 @@ export const loginHandler = async (
   try {
     const { clientId } = req.body as Record<string, unknown>;
 
+    console.log("here")
+
     if (!isUuid(clientId)) {
       res.status(400).json({ success: false, message: "Invalid clientId" });
       return;
     }
 
     const jwtSecret = process.env.JWT_SECRET || "";
-    const tokenExpirySeconds = 3600; // 1 hour
+    const tokenExpirySeconds = 3600; 
 
     const result = await authenticateByClientId({
       clientId: clientId as string,
