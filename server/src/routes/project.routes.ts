@@ -6,21 +6,13 @@ import {
 } from "../controllers/project.controller";
 import { authenticateRequest } from "../middlewares/authenticate.middleware";
 import { authorizeProjectAccess } from "../middlewares/authorizeProject.middleware";
-import { FeatureFlags } from "../config/featureFlags";
 
-export const projectRouter = (params: {
-	featureFlags: FeatureFlags;
-	jwtSecret: string;
-}) => {
-	const { featureFlags, jwtSecret } = params;
+export const projectRouter = (params: { jwtSecret: string }) => {
+	const { jwtSecret } = params;
 	const router = Router();
 
-	const authMiddleware = featureFlags.enableAuth
-		? [authenticateRequest(jwtSecret)]
-		: [];
-	const projectAuthMiddleware = featureFlags.enableAuth
-		? [authenticateRequest(jwtSecret), authorizeProjectAccess]
-		: [];
+	const authMiddleware = [authenticateRequest(jwtSecret)];
+	const projectAuthMiddleware = [authenticateRequest(jwtSecret), authorizeProjectAccess];
 
 	router.get("/api/projects", ...authMiddleware, listProjectsHandler);
 	router.get(

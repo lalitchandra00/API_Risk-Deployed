@@ -32,6 +32,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
+      console.log("first")
       const response = await fetch(
         new URL("/api/auth/login", config.apiUrl).toString(),
         {
@@ -40,6 +41,9 @@ export default function LoginPage() {
           body: JSON.stringify({ clientId: clientId.trim() }),
         },
       );
+
+      console.log("second")
+      console.log(response);
 
       const data = (await response.json()) as LoginResponse;
 

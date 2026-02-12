@@ -45,11 +45,15 @@ function normalizeSeverity(value) {
 
 export function buildReport({
   projectRoot,
+  projectId,
+  projectName,
+  repoIdentifier,
+  clientId,
+  reportId,
   scanMode,
   filesScannedCount,
   baselineFindings,
   aiReviewed,
-  runId,
   timestamp
 }) {
   const aiById = new Map(aiReviewed.map((entry) => [entry.finding.findingId, entry.decision]));
@@ -83,16 +87,24 @@ export function buildReport({
       ? "allowed_with_warnings"
       : "allowed";
 
+  // Server-compatible format
   return {
-    runId,
-    timestamp,
-    projectRoot,
-    scanMode,
-    summary: {
-      totalFilesScanned: filesScannedCount,
-      totalFindings: findings.length,
-      blocksCount,
-      warningsCount
+    projectId,
+    clientId,
+    project: {
+      name: projectName || "Unknown Project",
+      repoIdentifier: repoIdentifier || projectRoot
+    },
+    report: {
+      timestamp,
+      scanMode,
+      summary: {
+        filesScanned: filesScannedCount,
+        findings: findings.length,
+        blocks: blocksCount,
+        warnings: warningsCount,
+        finalVerdict
+      }
     },
     findings,
     finalVerdict

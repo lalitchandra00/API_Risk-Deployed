@@ -4,6 +4,7 @@ import { upsertProject } from "./project.controller";
 import { ReportModel } from "../models/report.model";
 import { FindingModel } from "../models/finding.model";
 import { getReportWithFindings, listProjectReports } from "../services/report.service";
+import { ensureUserForClientId } from "../services/auth.service";
 import { logger } from "../utils/logger";
 
 class PayloadError extends Error {
@@ -232,6 +233,11 @@ export const createReportHandler = async (
   try {
     const payload = validatePayload(req.body);
     const reportId = uuidv4();
+
+    console.log("Report received from CLI");
+
+    // Auto-create user for this clientId so they can login immediately
+    await ensureUserForClientId(payload.clientId);
 
     await upsertProject({
       projectId: payload.projectId,

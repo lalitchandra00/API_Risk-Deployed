@@ -50,6 +50,7 @@ export async function runInit({ cwd }) {
       projectId: randomUUID(),
       projectType,
       scanMode: "staged",
+      enforcement: "enabled",
       features: {
         reporting: true,
         integration: false,
@@ -68,6 +69,18 @@ export async function runInit({ cwd }) {
     };
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n", "utf8");
     logSuccess("Created codeproof.config.json");
+  }
+
+  try {
+    const raw = fs.readFileSync(configPath, "utf8");
+    const existing = JSON.parse(raw);
+    if (!existing.enforcement) {
+      existing.enforcement = "enabled";
+      fs.writeFileSync(configPath, JSON.stringify(existing, null, 2) + "\n", "utf8");
+      logSuccess("Added enforcement=enabled to codeproof.config.json");
+    }
+  } catch {
+    logWarn("Unable to update enforcement in codeproof.config.json.");
   }
 
   installPreCommitHook(gitRoot);

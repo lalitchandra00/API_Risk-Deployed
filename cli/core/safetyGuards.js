@@ -18,9 +18,13 @@ export function reportFeatureDisabled(name, verbose, logInfo) {
   logInfo(`${name} disabled by feature flag.`);
 }
 
-export function withFailOpenReporting(action, onError) {
+export async function withFailOpenReporting(action, onError) {
   try {
-    return action();
+    const result = action();
+    if (result && typeof result.then === 'function') {
+      return await result;
+    }
+    return result;
   } catch {
     if (onError) {
       onError();
@@ -29,21 +33,24 @@ export function withFailOpenReporting(action, onError) {
   }
 }
 
-export function withFailOpenIntegration(action) {
+export async function withFailOpenIntegration(action) {
   try {
-    action();
+    const result = action();
+    if (result && typeof result.then === 'function') {
+      await result;
+    }
   } catch {
     // Integration failures are ignored to avoid affecting commits.
   }
 }
 
-export function withFailOpenAiEscalation(enabled, action) {
+export async function withFailOpenAiEscalation(enabled, action) {
   if (!enabled) {
     return [];
   }
 
   try {
-    return action();
+    return await action();
   } catch {
     // AI failures downgrade to warnings by returning no decisions.
     return [];

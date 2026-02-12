@@ -102,3 +102,30 @@ export const authenticateByClientId = async (params: {
     },
   };
 };
+
+/**
+ * Ensures a user exists for the given clientId.
+ * Creates a new user if none exists, or links the clientId to an existing user.
+ * 
+ * This is called automatically when reports are ingested, ensuring
+ * CLI users can immediately login after their first report push.
+ */
+export const ensureUserForClientId = async (
+  clientId: string
+): Promise<void> => {
+  if (!isUuid(clientId)) {
+    return;
+  }
+
+  let user = await UserModel.findOne({ linkedClientIds: clientId });
+
+  if (!user) {
+    const userId = uuidv4();
+    await UserModel.create({
+      userId,
+      linkedClientIds: [clientId],
+      createdAt: new Date(),
+      lastLoginAt: new Date(),
+    });
+  }
+};
