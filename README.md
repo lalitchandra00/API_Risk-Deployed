@@ -1,9 +1,6 @@
 # API Risk
 Developed a Machine Learning–based security detection system that scans code snippets to identify API keys or secrets, helping prevent accidental credential leaks in repositories and reducing risk of automated exploitation by malicious bots.
 Designed and implemented a text classification pipeline using TF-IDF feature extraction and Logistic Regression to automatically flag sensitive tokens, enabling proactive detection of credential exposure before code deployment.
-## Project Overview
-Developed a Machine Learning–based security detection system that scans code snippets to identify API keys or secrets, helping prevent accidental credential leaks in repositories and reducing risk of automated exploitation by malicious bots.
-Designed and implemented a text classification pipeline using TF-IDF feature extraction and Logistic Regression to automatically flag sensitive tokens, enabling proactive detection of credential exposure before code deployment.
 <br>
 ## Dataset
 The model is trained on a text-based risk classification dataset, where each data sample is labeled according to its severity level.
