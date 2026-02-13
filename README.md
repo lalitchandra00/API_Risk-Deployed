@@ -1,9 +1,9 @@
 # API Risk
-This project implements a Machine Learning–based Risk Classification API using Python.
-It analyzes raw text input such as logs, messages, or code snippets and classifies the content into Critical, High Risk, or No Risk categories.
+Developed a Machine Learning–based security detection system that scans code snippets to identify API keys or secrets, helping prevent accidental credential leaks in repositories and reducing risk of automated exploitation by malicious bots.
+Designed and implemented a text classification pipeline using TF-IDF feature extraction and Logistic Regression to automatically flag sensitive tokens, enabling proactive detection of credential exposure before code deployment.
 ## Project Overview
-This is an end-to-end Machine Learning and API deployment project that demonstrates how a trained NLP model can be exposed as a web service.
-The system uses a trained classification model to evaluate incoming text in real time and determine the associated risk level based on learned patterns.
+Developed a Machine Learning–based security detection system that scans code snippets to identify API keys or secrets, helping prevent accidental credential leaks in repositories and reducing risk of automated exploitation by malicious bots.
+Designed and implemented a text classification pipeline using TF-IDF feature extraction and Logistic Regression to automatically flag sensitive tokens, enabling proactive detection of credential exposure before code deployment.
 <br>
 ## Dataset
 The model is trained on a text-based risk classification dataset, where each data sample is labeled according to its severity level.
