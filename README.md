@@ -1,6 +1,6 @@
 # API Risk
 This project implements a Machine Learning–based Risk Classification API using Python.
-It analyzes raw text input such as logs, messages, or code snippets and classifies the content into Critical, High Risk, or No Risk categories through a deployed REST API.
+It analyzes raw text input such as logs, messages, or code snippets and classifies the content into Critical, High Risk, or No Risk categories.
 ## Project Overview
 This is an end-to-end Machine Learning and API deployment project that demonstrates how a trained NLP model can be exposed as a web service.
 The system uses a trained classification model to evaluate incoming text in real time and determine the associated risk level based on learned patterns.
