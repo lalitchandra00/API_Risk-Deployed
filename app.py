@@ -3,7 +3,7 @@ import pickle
 
 # ---------- PAGE CONFIG ----------
 st.set_page_config(
-    page_title="Secret Risk Scanner",
+    page_title="API Risk",
     page_icon="🔐",
     layout="centered"
 )
@@ -22,7 +22,7 @@ model, vectorizer = load_models()
 
 # ---------- HEADER ----------
 st.markdown("""
-<h1 style='text-align:center; color:#38bdf8;'>🔐 Secret Risk Scanner</h1>
+<h1 style='text-align:center; color:#38bdf8;'>🔐 API RISK</h1>
 <p style='text-align:center; color:gray;'>AI-powered detection for API keys, tokens & sensitive secrets</p>
 """, unsafe_allow_html=True)
 
@@ -36,7 +36,7 @@ text = st.text_area(
     placeholder="Example: api_key = sk-23498234..."
 )
 
-scan = st.button("🚀 Scan For Secrets", use_container_width=True)
+scan = st.button("🚀 Scan For Secrets ", use_container_width=True)
 
 
 # ---------- PREDICTION ----------
@@ -49,7 +49,7 @@ if scan:
     lines = text.splitlines()
     found = False
 
-    with st.spinner("Scanning for secrets..."):
+    with st.spinner("Scanning for API secrets..."):
 
         for line in lines:
             words = line.split()
@@ -74,4 +74,4 @@ if scan:
                 break
 
     if not found:
-        st.success("✅ No Secrets Found — Safe Code")
+        st.success("✅ No API Secrets Found — Safe Code")
